@@ -154,6 +154,31 @@ button {
 
 .composer input { flex: 1; min-width: 0; }
 
+.attach {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  font-size: 20px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.attach.busy {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.photo {
+  display: block;
+  max-width: 100%;
+  max-height: 320px;
+  margin-top: 4px;
+  border-radius: 10px;
+}
+
 @media (max-width: 600px) {
   .users { display: none; }
   .message { max-width: 90%; }

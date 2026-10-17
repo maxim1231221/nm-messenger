@@ -29,6 +29,10 @@
       </aside>
     </div>
     <form id="send-form" class="composer">
+      <label class="attach" title="Отправить фото" aria-label="Отправить фото">
+        📎
+        <input id="photo" type="file" accept="image/*" hidden>
+      </label>
       <input id="text" maxlength="2000" placeholder="Сообщение…" autocomplete="off">
       <button type="submit">Отправить</button>
     </form>
