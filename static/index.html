@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>nm-messenger</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <section id="login" class="login">
+    <form id="login-form" class="card">
+      <h1>nm-messenger</h1>
+      <label for="name">Как тебя зовут?</label>
+      <input id="name" maxlength="32" autocomplete="nickname" required autofocus>
+      <button type="submit">Войти</button>
+    </form>
+  </section>
+
+  <main id="chat" class="chat" hidden>
+    <header class="topbar">
+      <strong>nm-messenger</strong>
+      <span id="status" class="status">подключение…</span>
+    </header>
+    <div class="layout">
+      <ul id="messages" class="messages" aria-live="polite"></ul>
+      <aside class="users">
+        <h2>Онлайн</h2>
+        <ul id="users"></ul>
+      </aside>
+    </div>
+    <form id="send-form" class="composer">
+      <input id="text" maxlength="2000" placeholder="Сообщение…" autocomplete="off">
+      <button type="submit">Отправить</button>
+    </form>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
