@@ -19,13 +19,17 @@
   <main id="chat" class="chat" hidden>
     <header class="topbar">
       <strong>nm-messenger</strong>
-      <span id="status" class="status">подключение…</span>
+      <span class="topbar-right">
+        <span id="status" class="status">подключение…</span>
+        <button type="button" class="clear-btn clear-mobile" data-clear title="Очистить чат">🗑</button>
+      </span>
     </header>
     <div class="layout">
       <ul id="messages" class="messages" aria-live="polite"></ul>
       <aside class="users">
         <h2>Онлайн</h2>
         <ul id="users"></ul>
+        <button type="button" class="clear-btn" data-clear>🗑 Очистить чат</button>
       </aside>
     </div>
     <form id="send-form" class="composer">

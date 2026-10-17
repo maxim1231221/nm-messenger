@@ -1,5 +1,6 @@
 """nm-messenger: простой веб-чат на FastAPI + WebSocket."""
 
+import json
 import re
 import uuid
 from collections import deque
@@ -14,6 +15,7 @@ from fastapi.staticfiles import StaticFiles
 STATIC_DIR = Path(__file__).parent / "static"
 UPLOAD_DIR = Path(__file__).parent / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
+HISTORY_FILE = Path(__file__).parent / "history.json"
 HISTORY_LIMIT = 100
 MAX_NAME_LEN = 32
 MAX_TEXT_LEN = 2000
@@ -28,7 +30,19 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 class ChatRoom:
     def __init__(self) -> None:
         self.clients: Dict[WebSocket, str] = {}
-        self.history: deque = deque(maxlen=HISTORY_LIMIT)
+        self.history: deque = deque(load_history(), maxlen=HISTORY_LIMIT)
+
+    def add(self, message: dict) -> None:
+        self.history.append(message)
+        save_history(self.history)
+
+    def clear(self) -> None:
+        for message in self.history:
+            image = message.get("image")
+            if image:
+                (UPLOAD_DIR / Path(image).name).unlink(missing_ok=True)
+        self.history.clear()
+        save_history(self.history)
 
     def online(self) -> list:
         return sorted(set(self.clients.values()))
@@ -43,6 +57,22 @@ class ChatRoom:
     async def system(self, text: str) -> None:
         await self.broadcast({"type": "system", "text": text, "time": now()})
         await self.broadcast({"type": "users", "users": self.online()})
+
+
+def load_history() -> list:
+    """Читает сохранённую историю, чтобы чат не пропадал после перезапуска сервера."""
+    try:
+        data = json.loads(HISTORY_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    return [m for m in data if isinstance(m, dict)] if isinstance(data, list) else []
+
+
+def save_history(history) -> None:
+    # Пишем во временный файл и подменяем, чтобы при сбое не получить обрезанный JSON.
+    tmp = HISTORY_FILE.with_suffix(".tmp")
+    tmp.write_text(json.dumps(list(history), ensure_ascii=False), encoding="utf-8")
+    tmp.replace(HISTORY_FILE)
 
 
 room = ChatRoom()
@@ -106,6 +136,11 @@ async def chat(ws: WebSocket) -> None:
     try:
         while True:
             data = await ws.receive_json()
+            if data.get("action") == "clear":
+                room.clear()
+                await room.broadcast({"type": "cleared"})
+                await room.system(f"{name} очистил чат")
+                continue
             text = str(data.get("text", "")).strip()[:MAX_TEXT_LEN]
             image = str(data.get("image", ""))
             if not IMAGE_URL_RE.match(image):
@@ -115,7 +150,7 @@ async def chat(ws: WebSocket) -> None:
             message = {"type": "message", "name": name, "text": text, "time": now()}
             if image:
                 message["image"] = image
-            room.history.append(message)
+            room.add(message)
             await room.broadcast(message)
     except (WebSocketDisconnect, ValueError):
         pass

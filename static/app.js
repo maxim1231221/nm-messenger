@@ -30,6 +30,8 @@ function connect() {
     if (data.type === "history") {
       $("messages").innerHTML = "";
       data.messages.forEach(addMessage);
+    } else if (data.type === "cleared") {
+      $("messages").innerHTML = "";
     } else if (data.type === "message") {
       addMessage(data);
     } else if (data.type === "system") {
@@ -52,6 +54,15 @@ $("send-form").addEventListener("submit", (e) => {
   ws.send(JSON.stringify({ text }));
   $("text").value = "";
 });
+
+// Очистка чата: удаляет историю у всех участников (и на сервере).
+document.querySelectorAll("[data-clear]").forEach((btn) =>
+  btn.addEventListener("click", () => {
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    if (!confirm("Очистить чат для всех участников? Сообщения и фото будут удалены.")) return;
+    ws.send(JSON.stringify({ action: "clear" }));
+  })
+);
 
 // Фото: выбираешь файл — он уменьшается, загружается на сервер и уходит в чат.
 // Текст из поля ввода (если есть) отправляется подписью к фото.

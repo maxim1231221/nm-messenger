@@ -91,6 +91,8 @@ button {
   border-bottom: 1px solid var(--border);
 }
 
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
 .status { color: var(--muted); font-size: 13px; }
 .status.ok { color: var(--ok); }
 
@@ -139,11 +141,28 @@ button {
   padding: 16px;
   border-left: 1px solid var(--border);
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
+
+.users ul { flex: 1; }
 
 .users h2 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 600; }
 .users ul { margin: 0; padding: 0; list-style: none; }
 .users li { padding: 2px 0; }
+
+.clear-btn {
+  margin-top: 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: #dc2626;
+  font-size: 13px;
+}
+
+.clear-btn:hover { border-color: #dc2626; }
+
+.clear-mobile { display: none; margin: 0; padding: 4px 8px; }
 
 .composer {
   display: flex;
@@ -181,5 +200,6 @@ button {
 
 @media (max-width: 600px) {
   .users { display: none; }
+  .clear-mobile { display: inline-block; }
   .message { max-width: 90%; }
 }
